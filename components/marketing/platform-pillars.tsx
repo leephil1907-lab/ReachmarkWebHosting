@@ -1,0 +1,1 @@
+export function PlatformPillars(){return <section id="platform" className="bg-[#080a0f] px-6 py-32 text-white"><div className="mx-auto max-w-7xl"><p className="text-xs uppercase tracking-[.24em] text-cyan-300">The platform</p><h2 className="mt-5 text-4xl tracking-[-.05em] sm:text-6xl">Infrastructure without the infrastructure headache.</h2></div></section>}
