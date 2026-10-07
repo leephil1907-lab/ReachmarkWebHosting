@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{color-scheme:dark}
+html{scroll-behavior:smooth}
+body{margin:0;background:#050609;color:#f7f8fb;font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+::selection{background:rgba(139,92,246,.35);color:white}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
