@@ -11,12 +11,12 @@ const services = [
 
 const tabs = ["Overview", "Services", "Deployments", "Variables", "Domains", "Metrics", "Activity"];
 
-export default function ProjectWorkspace({ params }: { params: { projectId: string } }) {
+export default async function ProjectWorkspace({ params }: { params: Promise<{ projectId: string }> }) {\n  const { projectId } = await params;
   const [tab, setTab] = useState("Overview");
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-        <div><Link href="/dashboard/projects" className="text-xs text-slate-500 hover:text-white">Projects</Link><div className="mt-3 flex flex-wrap items-center gap-3"><h1 className="text-3xl font-semibold">{params.projectId}</h1><span className="rounded-full border border-amber-300/20 bg-amber-300/[.04] px-3 py-1 text-xs text-amber-300">Setup required</span></div><p className="mt-2 text-sm text-slate-400">Production workspace • Lagos region</p></div>
+        <div><Link href="/dashboard/projects" className="text-xs text-slate-500 hover:text-white">Projects</Link><div className="mt-3 flex flex-wrap items-center gap-3"><h1 className="text-3xl font-semibold">{projectId}</h1><span className="rounded-full border border-amber-300/20 bg-amber-300/[.04] px-3 py-1 text-xs text-amber-300">Setup required</span></div><p className="mt-2 text-sm text-slate-400">Production workspace • Lagos region</p></div>
         <div className="flex gap-2"><select className="h-10 rounded-xl border border-white/10 bg-[#0d1016] px-3 text-sm text-slate-300"><option>Production</option><option>Preview</option></select><button disabled className="h-10 rounded-xl bg-white/10 px-4 text-sm text-slate-500">Deploy</button></div>
       </header>
 
