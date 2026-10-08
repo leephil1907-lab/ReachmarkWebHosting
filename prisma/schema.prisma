@@ -7,11 +7,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum MembershipRole {\n  OWNER\n  ADMIN\n  MEMBER\n}
-enum ServiceType {\n  APPLICATION\n  DATABASE\n  WORKER\n  CRON\n  STATIC\n}
-enum ServiceStatus {\n  PROVISIONING\n  HEALTHY\n  DEGRADED\n  STOPPED\n  FAILED\n}
-enum DeploymentStatus {\n  QUEUED\n  BUILDING\n  DEPLOYING\n  STARTING\n  HEALTHY\n  FAILED\n  STOPPING\n  STOPPED\n  ROLLED_BACK\n}
-enum EnvironmentKind {\n  PRODUCTION\n  PREVIEW\n  DEVELOPMENT\n}
+enum MembershipRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+enum ServiceType {
+  APPLICATION
+  DATABASE
+  WORKER
+  CRON
+  STATIC
+}
+enum ServiceStatus {
+  PROVISIONING
+  HEALTHY
+  DEGRADED
+  STOPPED
+  FAILED
+}
+enum DeploymentStatus {
+  QUEUED
+  BUILDING
+  DEPLOYING
+  STARTING
+  HEALTHY
+  FAILED
+  STOPPING
+  STOPPED
+  ROLLED_BACK
+}
+enum EnvironmentKind {
+  PRODUCTION
+  PREVIEW
+  DEVELOPMENT
+}
 
 model User {
   id        String       @id @default(cuid())
