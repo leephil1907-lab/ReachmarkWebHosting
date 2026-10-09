@@ -113,7 +113,7 @@ async function buildAndRun(deployment) {
       try { packageJson = JSON.parse(await readFile(packagePath, "utf8")); } catch { throw new Error("No Dockerfile or valid package.json found. Add a Dockerfile to the repository."); }
       if (!packageJson.scripts || !packageJson.scripts.start) throw new Error("No Dockerfile found and package.json has no start script.");
       const port = service.port || APP_PORT_DEFAULT;
-      const buildLine = service.buildCommand ? "RUN " + service.buildCommand.replace(/[\\r\\n]/g, " ") + "\\n" : "RUN npm run build --if-present\\n";
+      const buildLine = service.buildCommand ? "RUN " + service.buildCommand.split(String.fromCharCode(10)).join(" ").split(String.fromCharCode(13)).join(" ") + "\\n" : "RUN npm run build --if-present\\n";
       const generated = "FROM node:22-alpine\\nWORKDIR /app\\nCOPY package*.json ./\\nRUN npm install\\nCOPY . .\\n" + buildLine + "ENV NODE_ENV=production\\nEXPOSE " + port + "\\nCMD [\\"npm\\",\\"run\\",\\"start\\"]\\n";
       await writeFile(dockerfilePath, generated, "utf8");
       await addLog(id, "info", "Generated a Node.js Dockerfile because the repository did not contain one.");
