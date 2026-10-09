@@ -23,9 +23,11 @@ export async function POST(request: Request, { params }: Context) {
   const { serviceId } = await params;
   const service = await prisma.service.findFirst({
     where: { id: serviceId, project: { workspace: { memberships: { some: { userId: user.id } } } } },
-    select: { id: true, branch: true, repository: true },
+    select: { id: true, branch: true, repository: true, type: true },
   });
   if (!service) return NextResponse.json({ error: "Service not found." }, { status: 404 });
+  if (!service.repository) return NextResponse.json({ error: "Configure a GitHub repository before queuing a deployment." }, { status: 400 });
+  if (service.type !== "APPLICATION" && service.type !== "WORKER" && service.type !== "STATIC") return NextResponse.json({ error: "This service type is not supported by the deployment worker." }, { status: 400 });
   const body = await request.json().catch(() => ({}));
   const deployment = await prisma.deployment.create({
     data: {
