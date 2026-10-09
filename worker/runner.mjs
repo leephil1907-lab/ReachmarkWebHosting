@@ -91,6 +91,8 @@ async function buildAndRun(deployment) {
       }
     }
     const branch = deployment.branch || service.branch || "main";
+    if (!/^[A-Za-z0-9._/-]{1,120}$/.test(branch) || branch.startsWith("-")) throw new Error("Branch name contains unsupported characters.");
+    if (service.type !== "APPLICATION" && service.type !== "WORKER" && service.type !== "STATIC") throw new Error("This worker currently runs application, worker, and Dockerfile-based static services only.");
     const cloneEnv = { ...process.env };
     if (githubToken) {
       cloneEnv.GIT_CONFIG_COUNT = "1";
