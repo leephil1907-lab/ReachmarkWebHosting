@@ -76,7 +76,7 @@ export function HostingCoreScene({scrollProgress=0,mobile=false}:Props){
       {!mobile&&<group position={[0,-1.65,0]}><Text fontSize={.14} color="#f8fafc" anchorX="center" anchorY="middle" letterSpacing={.08}>REACHMARK CORE</Text><Text position={[0,-.22,0]} fontSize={.085} color="#8793a8" anchorX="center" anchorY="middle">DEPLOYMENT INFRASTRUCTURE</Text></group>}
       {services.map(s=><ServiceNode key={s.name} {...s} mobile={mobile}/>)}
       {!mobile&&<Sparkles count={90} scale={[8,5,8]} size={1.8} speed={.22} noise={.7} color="#8b5cf6"/>}
-      <points><bufferGeometry><bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3}/></bufferGeometry><pointsMaterial color="#22d3ee" size={mobile?.028:.018} transparent opacity={.45} sizeAttenuation blending={THREE.AdditiveBlending}/></points>
+      <points><bufferGeometry><bufferAttribute attach="attributes-position" args={[positions,3]}/></bufferGeometry><pointsMaterial color="#22d3ee" size={mobile?.028:.018} transparent opacity={.45} sizeAttenuation blending={THREE.AdditiveBlending}/></points>
     </group>
     <ScrollCamera scrollProgress={scrollProgress}/>
   </>;
