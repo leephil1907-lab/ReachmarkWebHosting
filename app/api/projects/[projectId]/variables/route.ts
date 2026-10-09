@@ -49,3 +49,16 @@ export async function POST(request: Request, { params }: Context) {
     return NextResponse.json({ error: message }, { status: 503 });
   }
 }
+
+export async function DELETE(request: Request, { params }: Context) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  const { projectId } = await params;
+  const project = await ownedProject(projectId, user.id);
+  if (!project) return NextResponse.json({ error: "Project not found." }, { status: 404 });
+  const environment = project.environments[0];
+  const key = new URL(request.url).searchParams.get("key") || "";
+  if (!environment || !/^[A-Z_][A-Z0-9_]{0,127}$/.test(key)) return NextResponse.json({ error: "Valid variable key required." }, { status: 400 });
+  const result = await prisma.environmentVariable.deleteMany({ where: { environmentId: environment.id, key } });
+  return result.count ? NextResponse.json({ ok: true }) : NextResponse.json({ error: "Variable not found." }, { status: 404 });
+}
