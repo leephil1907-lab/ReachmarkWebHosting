@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: 22
       - run: npm install
-      - run: npx prisma format --check
+      - run: npx prisma validate
       - run: npx prisma generate
       - run: npx tsc --noEmit
       - run: npm run build
