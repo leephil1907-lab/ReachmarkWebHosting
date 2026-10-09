@@ -22,14 +22,13 @@ Implemented in the current code:
 
 ## Important runtime boundary
 
-This repository is **not yet a complete public hosting provider**. The web control plane can save projects, service configuration, secrets and deployment records. A deployment request currently creates a queued record and a clear log that no build worker is connected. It does not build or run arbitrary customer code.
+This repository is **not yet a complete public hosting provider**. By default, the web control plane saves projects, service configuration, secrets and deployment records; without the optional worker, deployment requests remain queued and clearly report that no worker is connected. When the worker and ingress stack are separately configured, it can build and run supported application containers on that dedicated host.
 
 Not yet implemented/provisioned:
 - Durable external job queue, multi-worker scheduling and build cancellation
 - Zero-downtime releases, automatic rollback, image registry and persistent volumes
 - Custom-domain DNS verification/routing and managed database provisioning
 - Live resource metrics, log streaming, alerts, quotas and billing/metering
-- Production-grade rate limiting, account recovery, team invitation management, and external security review
 - Live resource metrics, log streaming, alerts, quotas and billing/metering
 - Production-grade rate limiting, account recovery, team invitation management, and external security review
 
