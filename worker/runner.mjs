@@ -103,6 +103,9 @@ async function buildAndRun(deployment) {
     await run("git", ["clone", "--depth", "1", "--branch", branch, service.repository, sourceDir], { env: cloneEnv });
     delete cloneEnv.GIT_CONFIG_VALUE_0;
     githubToken = "";
+    const commit = await run("git", ["-C", sourceDir, "rev-parse", "HEAD"], { env: process.env });
+    await prisma.deployment.update({ where: { id }, data: { commitSha: commit.stdout.trim(), branch } });
+    await addLog(id, "info", "Source commit: " + commit.stdout.trim());
 
     const dockerfilePath = path.join(sourceDir, "Dockerfile");
     let dockerfileExists = true;
