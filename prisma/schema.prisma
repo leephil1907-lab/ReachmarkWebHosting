@@ -12,6 +12,7 @@ enum MembershipRole {
   ADMIN
   MEMBER
 }
+
 enum ServiceType {
   APPLICATION
   DATABASE
@@ -19,6 +20,7 @@ enum ServiceType {
   CRON
   STATIC
 }
+
 enum ServiceStatus {
   PROVISIONING
   HEALTHY
@@ -26,6 +28,7 @@ enum ServiceStatus {
   STOPPED
   FAILED
 }
+
 enum DeploymentStatus {
   QUEUED
   BUILDING
@@ -37,6 +40,7 @@ enum DeploymentStatus {
   STOPPED
   ROLLED_BACK
 }
+
 enum EnvironmentKind {
   PRODUCTION
   PREVIEW
@@ -44,12 +48,12 @@ enum EnvironmentKind {
 }
 
 model User {
-  id        String       @id @default(cuid())
-  email     String       @unique
-  name      String?
-  avatarUrl String?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id          String       @id @default(cuid())
+  email       String       @unique
+  name        String?
+  avatarUrl   String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   memberships Membership[]
 }
 
@@ -71,70 +75,75 @@ model Membership {
   user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   workspace   Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   createdAt   DateTime       @default(now())
+
   @@unique([userId, workspaceId])
 }
 
 model Project {
-  id          String        @id @default(cuid())
-  name        String
-  slug        String
-  description String?
-  workspaceId String
-  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  id           String        @id @default(cuid())
+  name         String
+  slug         String
+  description  String?
+  workspaceId  String
+  workspace    Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   environments Environment[]
-  services    Service[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  services     Service[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
   @@unique([workspaceId, slug])
 }
 
 model Environment {
-  id        String          @id @default(cuid())
-  name      String
-  kind      EnvironmentKind @default(PRODUCTION)
-  projectId String
-  project   Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  services  Service[]
-  createdAt DateTime        @default(now())
+  id         String                @id @default(cuid())
+  name       String
+  kind       EnvironmentKind       @default(PRODUCTION)
+  projectId  String
+  project    Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  services   Service[]
+  variables  EnvironmentVariable[]
+  createdAt  DateTime              @default(now())
+
   @@unique([projectId, name])
 }
 
 model Service {
-  id              String          @id @default(cuid())
-  name            String
-  type            ServiceType
-  status          ServiceStatus   @default(PROVISIONING)
-  region          String          @default("lagos")
-  repository      String?
-  branch          String?
-  rootDirectory   String?
-  buildCommand    String?
-  startCommand    String?
-  port            Int?
-  projectId       String
-  environmentId   String
-  project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  environment     Environment     @relation(fields: [environmentId], references: [id], onDelete: Cascade)
-  deployments     Deployment[]
-  domains         Domain[]
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  id            String          @id @default(cuid())
+  name          String
+  type          ServiceType
+  status        ServiceStatus   @default(PROVISIONING)
+  region        String          @default("lagos")
+  repository    String?
+  branch        String?
+  rootDirectory String?
+  buildCommand  String?
+  startCommand  String?
+  port          Int?
+  projectId     String
+  environmentId String
+  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  environment   Environment     @relation(fields: [environmentId], references: [id], onDelete: Cascade)
+  deployments   Deployment[]
+  domains       Domain[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
   @@unique([environmentId, name])
 }
 
 model Deployment {
-  id          String           @id @default(cuid())
-  status      DeploymentStatus @default(QUEUED)
-  commitSha   String?
-  branch      String?
-  sourceRef   String?
-  imageRef    String?
-  serviceId   String
-  service     Service          @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  startedAt   DateTime?
-  finishedAt  DateTime?
-  createdAt   DateTime         @default(now())
-  logs        DeploymentLog[]
+  id         String           @id @default(cuid())
+  status     DeploymentStatus @default(QUEUED)
+  commitSha  String?
+  branch     String?
+  sourceRef  String?
+  imageRef   String?
+  serviceId  String
+  service    Service          @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  startedAt  DateTime?
+  finishedAt DateTime?
+  createdAt  DateTime         @default(now())
+  logs       DeploymentLog[]
 }
 
 model DeploymentLog {
@@ -145,28 +154,30 @@ model DeploymentLog {
   message      String
   metadata     Json?
   deployment   Deployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+
   @@index([deploymentId, timestamp])
 }
 
 model Domain {
-  id          String   @id @default(cuid())
-  hostname    String   @unique
-  verified    Boolean  @default(false)
-  sslStatus   String   @default("PENDING")
-  serviceId   String
-  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  hostname  String   @unique
+  verified  Boolean  @default(false)
+  sslStatus String   @default("PENDING")
+  serviceId String
+  service   Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model EnvironmentVariable {
-  id            String      @id @default(cuid())
-  key           String
+  id             String      @id @default(cuid())
+  key            String
   valueEncrypted String
-  isSecret      Boolean     @default(true)
-  environmentId String
-  environment   Environment @relation(fields: [environmentId], references: [id], onDelete: Cascade)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  isSecret       Boolean     @default(true)
+  environmentId  String
+  environment    Environment @relation(fields: [environmentId], references: [id], onDelete: Cascade)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
   @@unique([environmentId, key])
 }
