@@ -28,7 +28,7 @@ export async function GET() {
     }
   }
 
-  const healthy = !databaseConfigured || database === "connected";
+  const healthy = database === "connected";
 
   return NextResponse.json(
     {
