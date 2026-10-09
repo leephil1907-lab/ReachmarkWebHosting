@@ -47,7 +47,7 @@ async function claimNext() {
     include: {
       service: {
         include: {
-          project: { include: { workspace: { include: { memberships: { include: { user: { include: { gitHubConnection: true } } } } } } },
+          project: { include: { workspace: { include: { memberships: { include: { user: { include: { githubConnection: true } } } } } } },
           environment: { include: { variables: true } }
         }
       }
@@ -85,8 +85,8 @@ async function buildAndRun(deployment) {
     let githubToken = "";
     const memberships = service.project.workspace.memberships || [];
     for (const membership of memberships) {
-      if (membership.user.gitHubConnection) {
-        githubToken = decryptSecret(membership.user.gitHubConnection.accessTokenEncrypted);
+      if (membership.user.githubConnection) {
+        githubToken = decryptSecret(membership.user.githubConnection.accessTokenEncrypted);
         break;
       }
     }
