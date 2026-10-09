@@ -33,3 +33,16 @@ export async function POST(request: Request, { params }: Context) {
     return NextResponse.json({ error: "That domain may already be attached." }, { status: 409 });
   }
 }
+
+export async function DELETE(request: Request, { params }: Context) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  const { projectId } = await params;
+  const project = await prisma.project.findFirst({ where: { id: projectId, workspace: { memberships: { some: { userId: user.id, role: { in: ["OWNER", "ADMIN"] } } } } }, select: { id: true } });
+  if (!project) return NextResponse.json({ error: "Project not found or permission denied." }, { status: 404 });
+  const domainId = new URL(request.url).searchParams.get("id") || "";
+  const domain = await prisma.domain.findFirst({ where: { id: domainId, service: { projectId } }, select: { id: true } });
+  if (!domain) return NextResponse.json({ error: "Domain not found." }, { status: 404 });
+  await prisma.domain.delete({ where: { id: domain.id } });
+  return NextResponse.json({ ok: true });
+}
