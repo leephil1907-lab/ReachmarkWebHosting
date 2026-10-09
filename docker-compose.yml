@@ -10,6 +10,8 @@ services:
       - "127.0.0.1:5432:5432"
     volumes:
       - reachmark_postgres:/var/lib/postgresql/data
+    networks:
+      - reachmark-control
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U reachmark -d reachmark"]
       interval: 5s
@@ -18,3 +20,7 @@ services:
 
 volumes:
   reachmark_postgres:
+
+networks:
+  reachmark-control:
+    name: reachmark-control
