@@ -17,6 +17,9 @@ export async function POST(request: Request, { params }: Context) {
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const allowed = ["APPLICATION", "DATABASE", "WORKER", "CRON", "STATIC"] as const;
   const type = allowed.find((item) => item === body.type);
+  const buildCommand = typeof body.buildCommand === "string" ? body.buildCommand.trim() : "";
+  const startCommand = typeof body.startCommand === "string" ? body.startCommand.trim() : "";
+  if (buildCommand.length > 300 || startCommand.length > 300 || /[\\r\\n]/.test(buildCommand) || /[\\r\\n]/.test(startCommand)) return NextResponse.json({ error: "Build and start commands must be single-line and no longer than 300 characters." }, { status: 400 });
   const environment = project.environments[0];
   if (!environment || name.length < 2 || name.length > 60 || !type) {
     return NextResponse.json({ error: "Provide a valid service name and type." }, { status: 400 });
@@ -28,8 +31,8 @@ export async function POST(request: Request, { params }: Context) {
         repository: typeof body.repository === "string" ? body.repository.trim().slice(0, 500) || null : null,
         branch: typeof body.branch === "string" ? body.branch.trim().slice(0, 120) || null : null,
         rootDirectory: typeof body.rootDirectory === "string" ? body.rootDirectory.trim().slice(0, 200) || null : null,
-        buildCommand: typeof body.buildCommand === "string" ? body.buildCommand.trim().slice(0, 300) || null : null,
-        startCommand: typeof body.startCommand === "string" ? body.startCommand.trim().slice(0, 300) || null : null,
+        buildCommand: buildCommand.slice(0, 300) || null,
+        startCommand: startCommand.slice(0, 300) || null,
         port: Number.isInteger(body.port) && body.port >= 1 && body.port <= 65535 ? body.port : null,
       },
     });
