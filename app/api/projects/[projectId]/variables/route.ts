@@ -32,7 +32,7 @@ export async function POST(request: Request, { params }: Context) {
   const body = await request.json().catch(() => ({}));
   const key = typeof body.key === "string" ? body.key.trim() : "";
   const value = typeof body.value === "string" ? body.value : "";
-  if (!/^[A-Z_][A-Z0-9_]{0,127}$/.test(key) || value.length < 1 || value.length > 10000 || value.includes("\\n") || value.includes("\\r")) {
+  if (!/^[A-Z_][A-Z0-9_]{0,127}$/.test(key) || value.length < 1 || value.length > 10000 || value.includes(String.fromCharCode(10)) || value.includes(String.fromCharCode(13))) {
     return NextResponse.json({ error: "Use a valid environment key and a single-line value up to 10,000 characters." }, { status: 400 });
   }
   try {
