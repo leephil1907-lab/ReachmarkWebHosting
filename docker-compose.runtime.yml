@@ -1,0 +1,78 @@
+services:
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy:latest
+    restart: unless-stopped
+    environment:
+      CONTAINERS: "1"
+      NETWORKS: "1"
+      SERVICES: "1"
+      TASKS: "1"
+      INFO: "1"
+      POST: "0"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - reachmark-control
+
+  traefik:
+    image: traefik:v3.3
+    restart: unless-stopped
+    depends_on:
+      - docker-socket-proxy
+    command:
+      - --providers.docker=true
+      - --providers.docker.endpoint=tcp://docker-socket-proxy:2375
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=reachmark-edge
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:?Set ACME_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+      - --api.dashboard=false
+      - --accesslog=true
+      - --log.level=INFO
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - traefik_acme:/letsencrypt
+    networks:
+      - reachmark-control
+      - reachmark-edge
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    restart: unless-stopped
+    depends_on:
+      - traefik
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${WORKER_DATABASE_URL:?Set WORKER_DATABASE_URL}
+      SECRETS_ENCRYPTION_KEY: ${SECRETS_ENCRYPTION_KEY:?Set SECRETS_ENCRYPTION_KEY}
+      DEPLOYMENT_BASE_DOMAIN: ${DEPLOYMENT_BASE_DOMAIN:?Set DEPLOYMENT_BASE_DOMAIN}
+      DOCKER_NETWORK: reachmark-edge
+      TRAEFIK_CERT_RESOLVER: letsencrypt
+      WORKER_POLL_MS: ${WORKER_POLL_MS:-3000}
+      MAX_BUILD_MS: ${MAX_BUILD_MS:-720000}
+      MAX_HEALTH_MS: ${MAX_HEALTH_MS:-60000}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - reachmark-control
+      - reachmark-edge
+
+volumes:
+  traefik_acme:
+
+networks:
+  reachmark-control:
+    external: true
+    name: reachmark-control
+  reachmark-edge:
+    external: true
+    name: reachmark-edge
