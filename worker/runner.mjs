@@ -47,7 +47,19 @@ async function claimNext() {
     include: {
       service: {
         include: {
-          project: { include: { workspace: { include: { memberships: { include: { user: { include: { githubConnection: true } } } } } } },
+          project: {
+            include: {
+              workspace: {
+                include: {
+                  memberships: {
+                    include: {
+                      user: { include: { githubConnection: true } }
+                    }
+                  }
+                }
+              }
+            }
+          },
           environment: { include: { variables: true } }
         }
       }
